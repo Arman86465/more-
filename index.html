@@ -1,288 +1,117 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>User Panel</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<style>
-body{
-    font-family: Arial;
-    padding:20px;
-    background:#f5f5f5;
-}
-h2{ text-align:center; }
-
-.top-bar{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:15px;
-}
-
-input{
-    padding:8px;
-    width:300px;
-}
-
-button{
-    padding:8px 15px;
-    cursor:pointer;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    background:#fff;
-}
-
-th,td{
-    border:1px solid #ddd;
-    padding:8px;
-    text-align:center;
-}
-
-th{ background:#eee; }
-
-.copy-cell{ cursor:pointer; }
-
-.copy-cell:hover{ background:#f0f8ff; }
-
-.green-row{
-    background:#c8f7c5 !important;
-}
-
-select{ padding:5px; }
-
-.toast{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:#333;
-    color:#fff;
-    padding:8px 12px;
-    border-radius:5px;
-    font-size:14px;
-    opacity:0;
-    transition:0.3s;
-}
-</style>
+    <title>Username Password Copy Panel</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background: #f2f2f2;
+        }
+        tr.green {
+            background-color: #90ee90 !important;
+        }
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        input {
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
 
-<h2>User Data Panel</h2>
+<h2>Username Password Copy Website</h2>
 
-<div class="top-bar">
-    <input type="text" id="searchInput" placeholder="Search..." onkeyup="filterTable()">
-    <button onclick="downloadExcel()">Download Excel</button>
-</div>
+<label>Filter by SL No:</label>
+<input type="text" id="filterInput" placeholder="Enter SL No..." onkeyup="filterTable()">
 
-<table id="userTable">
-<thead>
-<tr>
-<th>Sr No</th>
-<th>User ID</th>
-<th>Password</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody id="tableBody"></tbody>
+<table id="dataTable">
+    <thead>
+        <tr>
+            <th>SL No</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Undo</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
 </table>
 
-<div id="toast" class="toast">Copied</div>
-
 <script>
+    const data = [
+        {sl: 2127, user: "CN072571300", pass: "CN072571300"},
+        {sl: 2127, user: "CN072571303", pass: "CN072571303"},
+        {sl: 8924, user: "CN072571304", pass: "CN072571304"},
+        {sl: 9030, user: "CN072585786", pass: "CN072585786"},
+        {sl: 5501, user: "CN072585866", pass: "CN072585866"}
+        // Yahan aur data add kar sakte ho
+    ];
 
-const data = [
-{user:"2127", pass:"CN072571300"},
-{user:"2127", pass:"CN072571303"},
-{user:"8924", pass:"CN072571304"},
-{user:"9030", pass:"CN072585786"},
-{user:"5501", pass:"CN072585866"},
-{user:"4909", pass:"CN072586014"},
-{user:"1189", pass:"CN072586029"},
-{user:"1988", pass:"CN072588467"},
-{user:"8422", pass:"CN072589491"},
-{user:"9402", pass:"CN072590494"},
-{user:"8370", pass:"CN072591910"},
-{user:"2076", pass:"CN0725103945"},
-{user:"4984", pass:"CN082507448"},
-{user:"3771", pass:"CN082531044"},
-{user:"5889", pass:"CN082531105"},
-{user:"8017", pass:"CN082536239"},
-{user:"4791", pass:"CN082547039"},
-{user:"5241", pass:"CN082547059"},
-{user:"4296", pass:"CN082547069"},
-{user:"1986", pass:"CN082547351"},
-{user:"5071", pass:"CN082559965"},
-{user:"7213", pass:"CN082562462"},
-{user:"1706", pass:"CN082562606"},
-{user:"2238", pass:"CN082565095"},
-{user:"8861", pass:"CN082565764"},
-{user:"2584", pass:"CN082571417"},
-{user:"7515", pass:"CN082574687"},
-{user:"5227", pass:"CN082574727"},
-{user:"3045", pass:"CN082574736"},
-{user:"6963", pass:"CN082574737"},
-{user:"5049", pass:"CN082574745"},
-{user:"7140", pass:"CN082574747"},
-{user:"5928", pass:"CN082574749"},
-{user:"8263", pass:"CN082574755"},
-{user:"8292", pass:"CN092515910"},
-{user:"6068", pass:"CN092518608"},
-{user:"6196", pass:"CN092519024"},
-{user:"8792", pass:"CN092519223"},
-{user:"5505", pass:"CN092520899"},
-{user:"7357", pass:"CN092521006"},
-{user:"8450", pass:"CN092522452"},
-{user:"2479", pass:"CN092544248"},
-{user:"8706", pass:"CN092558433"},
-{user:"6677", pass:"CN092563812"},
-{user:"8392", pass:"CN092570896"},
-{user:"8029", pass:"CN092571888"},
-{user:"7202", pass:"CN092572882"},
-{user:"3344", pass:"CN092572981"},
-{user:"1753", pass:"CN092573423"},
-{user:"8153", pass:"CN092574509"},
-{user:"1940", pass:"CN092582225"},
-{user:"7796", pass:"CN092584292"},
-{user:"3376", pass:"CN092585442"},
-{user:"9361", pass:"CN092586201"},
-{user:"1252", pass:"CN0925100310"},
-{user:"2494", pass:"CN0925100341"},
-{user:"2811", pass:"CN0925101014"},
-{user:"3184", pass:"CN0925101075"},
-{user:"2939", pass:"CN0925104089"},
-{user:"6238", pass:"CN0925104110"},
-{user:"9292", pass:"CN0925114874"},
-{user:"2302", pass:"CN0925116887"},
-{user:"1406", pass:"CN0925117364"},
-{user:"3668", pass:"CN0925119320"},
-{user:"4998", pass:"CN0925125200"},
-{user:"3493", pass:"CN0925126315"},
-{user:"8162", pass:"CN0925126552"},
-{user:"9350", pass:"CN0925126567"},
-{user:"6915", pass:"CN0925126831"},
-{user:"7620", pass:"CN0925126898"},
-{user:"8710", pass:"CN0925127319"},
-{user:"9737", pass:"CN0925128421"},
-{user:"6567", pass:"CN102532164"},
-{user:"5894", pass:"CN102569386"},
-{user:"7421", pass:"CN102571624"},
-{user:"6364", pass:"CN102588366"},
-{user:"6307", pass:"CN072500546"},
-{user:"3674", pass:"CN072573456"},
-{user:"6651", pass:"CN072586186"},
-{user:"1653", pass:"CN0725103283"},
-{user:"7329", pass:"CN0725110737"},
-{user:"7110", pass:"CN082510933"},
-{user:"9505", pass:"CN082511053"},
-{user:"3022", pass:"CN082511056"},
-{user:"5009", pass:"CN082511722"},
-{user:"7595", pass:"CN082532589"},
-{user:"5889", pass:"CN082536477"},
-{user:"2107", pass:"CN082536554"},
-{user:"1265", pass:"CN082546361"},
-{user:"8291", pass:"CN082547292"},
-{user:"7738", pass:"CN082557247"},
-{user:"6717", pass:"CN082571499"},
-{user:"5838", pass:"CN082571875"},
-{user:"8834", pass:"CN092527590"},
-{user:"7928", pass:"CN092527837"},
-{user:"5024", pass:"CN092536547"},
-{user:"5670", pass:"CN092536724"},
-{user:"4568", pass:"CN092536811"},
-{user:"1946", pass:"CN092537057"},
-{user:"5741", pass:"CN092537997"},
-{user:"5601", pass:"CN092538614"},
-{user:"4525", pass:"CN092545747"},
-{user:"6272", pass:"CN092549991"},
-{user:"6641", pass:"CN092554651"},
-{user:"4229", pass:"CN092554681"},
-{user:"5924", pass:"CN092554917"},
-{user:"9540", pass:"CN092558895"},
-{user:"1106", pass:"CN092560992"},
-{user:"5151", pass:"CN092564090"},
-{user:"3435", pass:"CN092568539"},
-{user:"7744", pass:"CN092568542"},
-{user:"6347", pass:"CN092569639"},
-{user:"9492", pass:"CN092577691"},
-{user:"7356", pass:"CN092577744"},
-{user:"6083", pass:"CN092582038"},
-{user:"9225", pass:"CN092590457"},
-{user:"4541", pass:"CN092590847"},
-{user:"8460", pass:"CN092590911"},
-{user:"8820", pass:"CN092592668"},
-{user:"6388", pass:"CN092594302"},
-{user:"1149", pass:"CN092594421"},
-{user:"5291", pass:"CN092594440"},
-{user:"6447", pass:"CN092594534"},
-{user:"4010", pass:"CN092594571"},
-{user:"3923", pass:"CN092594575"},
-{user:"7237", pass:"CN092595061"},
-{user:"7822", pass:"CN092595102"},
-{user:"8840", pass:"CN092595574"},
-{user:"6899", pass:"CN092595688"},
-{user:"5149", pass:"CN092595710"},
-{user:"4815", pass:"CN092596215"},
-{user:"7675", pass:"CN092596851"},
-{user:"9342", pass:"CN092599208"},
-{user:"6003", pass:"CN092599405"},
-{user:"9164", pass:"CN092599540"},
-{user:"9718", pass:"CN092599575"},
-{user:"8947", pass:"CN092599691"}
-];
+    const tableBody = document.querySelector("#dataTable tbody");
 
-const tableBody=document.getElementById("tableBody");
+    function renderTable() {
+        tableBody.innerHTML = "";
+        data.forEach((item, index) => {
+            const row = document.createElement("tr");
+            row.setAttribute("data-index", index);
 
-function loadTable(){
-    tableBody.innerHTML="";
-    data.forEach((item,index)=>{
-        tableBody.innerHTML+=`
-        <tr>
-            <td>${index+1}</td>
-            <td class="copy-cell" onclick="copyText('${item.user}',this)">${item.user}</td>
-            <td class="copy-cell" onclick="copyText('${item.pass}',this)">${item.pass}</td>
-            <td>
-                <select>
-                    <option value="">Select</option>
-                    <option>Active</option>
-                    <option>Inactive</option>
-                    <option>Pending</option>
-                    <option>Done</option>
-                </select>
-            </td>
-        </tr>`;
-    });
-}
+            if(localStorage.getItem("clicked_"+index) === "true") {
+                row.classList.add("green");
+            }
 
-function copyText(text,element){
-    navigator.clipboard.writeText(text);
-
-    document.querySelectorAll("tr").forEach(r=>r.classList.remove("green-row"));
-    element.parentElement.classList.add("green-row");
-
-    const toast=document.getElementById("toast");
-    toast.style.opacity="1";
-    setTimeout(()=>{ toast.style.opacity="0"; },1000);
-}
-
-function filterTable(){
-    const input=document.getElementById("searchInput").value.toLowerCase();
-    const rows=tableBody.getElementsByTagName("tr");
-    for(let i=0;i<rows.length;i++){
-        rows[i].style.display=rows[i].innerText.toLowerCase().includes(input)?"":"none";
+            row.innerHTML = `
+                <td>${item.sl}</td>
+                <td onclick="copyText('${item.user}', ${index})">${item.user}</td>
+                <td onclick="copyText('${item.pass}', ${index})">${item.pass}</td>
+                <td><button onclick="undoRow(${index})">Undo</button></td>
+            `;
+            tableBody.appendChild(row);
+        });
     }
-}
 
-function downloadExcel(){
-    let table = document.getElementById("userTable");
-    let wb = XLSX.utils.table_to_book(table, {sheet:"Users"});
-    XLSX.writeFile(wb, "User_Data.xlsx");
-}
+    function copyText(text, index) {
+        navigator.clipboard.writeText(text);
+        const row = document.querySelector(`tr[data-index='${index}']`);
+        row.classList.add("green");
+        localStorage.setItem("clicked_"+index, "true");
+    }
 
-loadTable();
+    function undoRow(index) {
+        const row = document.querySelector(`tr[data-index='${index}']`);
+        row.classList.remove("green");
+        localStorage.removeItem("clicked_"+index);
+    }
 
+    function filterTable() {
+        const input = document.getElementById("filterInput").value.toLowerCase();
+        const rows = tableBody.getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+            const sl = rows[i].getElementsByTagName("td")[0];
+            if (sl) {
+                let txtValue = sl.textContent || sl.innerText;
+                rows[i].style.display = txtValue.includes(input) ? "" : "none";
+            }
+        }
+    }
+
+    renderTable();
 </script>
+
 </body>
 </html>
