@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Username Password Copy Panel</title>
+    <title>Username Password Panel</title>
     <style>
         body {
             font-family: Arial;
@@ -15,9 +15,11 @@
             border: 1px solid #ccc;
             padding: 8px;
             text-align: center;
+            cursor: pointer;
         }
         th {
             background: #f2f2f2;
+            cursor: default;
         }
         tr.green {
             background-color: #90ee90 !important;
@@ -34,32 +36,34 @@
 </head>
 <body>
 
-<h2>Username Password Copy Website</h2>
+<h2>Username Password Copy Panel</h2>
 
-<label>Filter by SL No:</label>
-<input type="text" id="filterInput" placeholder="Enter SL No..." onkeyup="filterTable()">
+<label>Filter by Serial No:</label>
+<input type="text" id="filterInput" placeholder="Enter Serial No..." onkeyup="filterTable()">
 
 <table id="dataTable">
     <thead>
         <tr>
-            <th>SL No</th>
-            <th>Username</th>
-            <th>Password</th>
+            <th>Serial No</th>
+            <th>Username (4 Digit)</th>
+            <th>Password (CN Code)</th>
             <th>Undo</th>
         </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
 </table>
 
 <script>
     const data = [
-        {sl: 2127, user: "CN072571300", pass: "CN072571300"},
-        {sl: 2127, user: "CN072571303", pass: "CN072571303"},
-        {sl: 8924, user: "CN072571304", pass: "CN072571304"},
-        {sl: 9030, user: "CN072585786", pass: "CN072585786"},
-        {sl: 5501, user: "CN072585866", pass: "CN072585866"}
-        // Yahan aur data add kar sakte ho
+        {user: "2127", pass: "CN072571300"},
+        {user: "2127", pass: "CN072571303"},
+        {user: "8924", pass: "CN072571304"},
+        {user: "9030", pass: "CN072585786"},
+        {user: "5501", pass: "CN072585866"},
+        {user: "4909", pass: "CN072586014"},
+        {user: "1189", pass: "CN072586029"},
+        {user: "1988", pass: "CN072588467"}
+        // Yahan baaki data bhi add kar sakte ho
     ];
 
     const tableBody = document.querySelector("#dataTable tbody");
@@ -75,7 +79,7 @@
             }
 
             row.innerHTML = `
-                <td>${item.sl}</td>
+                <td>${index + 1}</td>
                 <td onclick="copyText('${item.user}', ${index})">${item.user}</td>
                 <td onclick="copyText('${item.pass}', ${index})">${item.pass}</td>
                 <td><button onclick="undoRow(${index})">Undo</button></td>
@@ -98,14 +102,13 @@
     }
 
     function filterTable() {
-        const input = document.getElementById("filterInput").value.toLowerCase();
+        const input = document.getElementById("filterInput").value;
         const rows = tableBody.getElementsByTagName("tr");
 
         for (let i = 0; i < rows.length; i++) {
-            const sl = rows[i].getElementsByTagName("td")[0];
-            if (sl) {
-                let txtValue = sl.textContent || sl.innerText;
-                rows[i].style.display = txtValue.includes(input) ? "" : "none";
+            const serial = rows[i].getElementsByTagName("td")[0];
+            if (serial) {
+                rows[i].style.display = serial.innerText.includes(input) ? "" : "none";
             }
         }
     }
@@ -114,4 +117,4 @@
 </script>
 
 </body>
-</html>
+</html> 
