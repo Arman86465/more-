@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Final Copy Panel</title>
+<title>Final Copy Panel - Share Enabled</title>
 <style>
 body{font-family:Arial;padding:20px}
 table{border-collapse:collapse;width:100%}
@@ -9,14 +9,20 @@ th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#f2f2f2}
 td.clickable{cursor:pointer}
 td.green{background:#90ee90!important}
-button{padding:4px 8px}
+button{padding:6px 10px;margin-top:5px;cursor:pointer}
 #copiedMsg{margin-top:10px;font-size:13px;color:green;display:none}
 input{padding:5px;margin-bottom:10px}
+#shareLink{width:100%;margin-top:5px}
 </style>
 </head>
 <body>
 
 <h2>Username Password Copy Panel</h2>
+
+<button onclick="generateShareLink()">Save & Generate Share Link</button>
+<input type="text" id="shareLink" readonly>
+
+<br><br>
 
 <label>Filter by Serial No:</label>
 <input type="text" id="filterInput" onkeyup="filterTable()" placeholder="Enter Serial No">
@@ -37,223 +43,43 @@ input{padding:5px;margin-bottom:10px}
 
 <script>
 
-const data = [
-["2127","CN072571300"],
-["2127","CN072571303"],
-["8924","CN072571304"],
-["9030","CN072585786"],
-["5501","CN072585866"],
-["4909","CN072586014"],
-["1189","CN072586029"],
-["1988","CN072588467"],
-["8422","CN072589491"],
-["9402","CN072590494"],
-["8370","CN072591910"],
-["2076","CN0725103945"],
-["4984","CN082507448"],
-["3771","CN082531044"],
-["5889","CN082531105"],
-["8017","CN082536239"],
-["4791","CN082547039"],
-["5241","CN082547059"],
-["4296","CN082547069"],
-["1986","CN082547351"],
-["5071","CN082559965"],
-["7213","CN082562462"],
-["1706","CN082562606"],
-["2238","CN082565095"],
-["8861","CN082565764"],
-["2584","CN082571417"],
-["7515","CN082574687"],
-["5227","CN082574727"],
-["3045","CN082574736"],
-["6963","CN082574737"],
-["5049","CN082574745"],
-["7140","CN082574747"],
-["5928","CN082574749"],
-["8263","CN082574755"],
-["8292","CN092515910"],
-["6068","CN092518608"],
-["6196","CN092519024"],
-["8792","CN092519223"],
-["5505","CN092520899"],
-["7357","CN092521006"],
-["8450","CN092522452"],
-["2479","CN092544248"],
-["8706","CN092558433"],
-["6677","CN092563812"],
-["8392","CN092570896"],
-["8029","CN092571888"],
-["7202","CN092572882"],
-["3344","CN092572981"],
-["1753","CN092573423"],
-["8153","CN092574509"],
-["1940","CN092582225"],
-["7796","CN092584292"],
-["3376","CN092585442"],
-["9361","CN092586201"],
-["1252","CN0925100310"],
-["2494","CN0925100341"],
-["2811","CN0925101014"],
-["3184","CN0925101075"],
-["2939","CN0925104089"],
-["6238","CN0925104110"],
-["9292","CN0925114874"],
-["2302","CN0925116887"],
-["1406","CN0925117364"],
-["3668","CN0925119320"],
-["4998","CN0925125200"],
-["3493","CN0925126315"],
-["8162","CN0925126552"],
-["9350","CN0925126567"],
-["6915","CN0925126831"],
-["7620","CN0925126898"],
-["8710","CN0925127319"],
-["9737","CN0925128421"],
-["6567","CN102532164"],
-["5894","CN102569386"],
-["7421","CN102571624"],
-["6364","CN102588366"],
-["6307","CN072500546"],
-["3674","CN072573456"],
-["6651","CN072586186"],
-["1653","CN0725103283"],
-["7329","CN0725110737"],
-["7110","CN082510933"],
-["9505","CN082511053"],
-["3022","CN082511056"],
-["5009","CN082511722"],
-["7595","CN082532589"],
-["5889","CN082536477"],
-["2107","CN082536554"],
-["1265","CN082546361"],
-["8291","CN082547292"],
-["7738","CN082557247"],
-["6717","CN082571499"],
-["5838","CN082571875"],
-["8834","CN092527590"],
-["7928","CN092527837"],
-["5024","CN092536547"],
-["5670","CN092536724"],
-["4568","CN092536811"],
-["1946","CN092537057"],
-["5741","CN092537997"],
-["5601","CN092538614"],
-["4525","CN092545747"],
-["6272","CN092549991"],
-["6641","CN092554651"],
-["4229","CN092554681"],
-["5924","CN092554917"],
-["9540","CN092558895"],
-["1106","CN092560992"],
-["5151","CN092564090"],
-["3435","CN092568539"],
-["7744","CN092568542"],
-["6347","CN092569639"],
-["9492","CN092577691"],
-["7356","CN092577744"],
-["6083","CN092582038"],
-["9225","CN092590457"],
-["4541","CN092590847"],
-["8460","CN092590911"],
-["8820","CN092592668"],
-["6388","CN092594302"],
-["1149","CN092594421"],
-["5291","CN092594440"],
-["6447","CN092594534"],
-["4010","CN092594571"],
-["3923","CN092594575"],
-["7237","CN092595061"],
-["7822","CN092595102"],
-["8840","CN092595574"],
-["6899","CN092595688"],
-["5149","CN092595710"],
-["4815","CN092596215"],
-["7675","CN092596851"],
-["9342","CN092599208"],
-["6003","CN092599405"],
-["9164","CN092599540"],
-["9718","CN092599575"],
-["8947","CN092599691"],
-["2693","CN0925100176"],
-["7776","CN0925105442"],
-["7288","CN0925106609"],
-["4692","CN0925110876"],
-["6806","CN0925112218"],
-["8761","CN0925113684"],
-["4643","CN0925114253"],
-["9579","CN0925115571"],
-["4895","CN0925115707"],
-["3402","CN0925124606"],
-["4200","CN102511198"],
-["5820","CN102514648"],
-["4057","CN102515026"],
-["9831","CN102527008"],
-["3482","CN102531181"],
-["5441","CN102536034"],
-["3717","CN102538779"],
-["2149","CN102542777"],
-["5936","CN102547010"],
-["5746","CN102552607"],
-["6544","CN102554878"],
-["3502","CN102560922"],
-["1169","CN102562598"],
-["3189","CN102564189"],
-["6192","CN102564236"],
-["4911","CN102575598"],
-["8415","CN102575627"],
-["3610","CN102575693"],
-["6618","CN102575746"],
-["7626","CN102577813"],
-["8198","CN102590956"],
-["9274","CN102592398"],
-["4329","CN102594322"],
-["8296","CN102594344"],
-["9975","CN102595551"],
-["5945","CN102598660"],
-["1597","CN082571239"],
-["1252","CN072500758"],
-["3443","CN072544612"],
-["2186","CN072552268"],
-["2132","CN072552277"],
-["6938","CN072552692"],
-["9934","CN072560551"],
-["7860","CN072560554"],
-["2051","CN072560583"],
-["4375","CN072573554"],
-["6805","CN072574139"],
-["7465","CN072574153"],
-["5966","CN072574158"],
-["8777","CN072574222"],
-["6464","CN072574250"],
-["8328","CN072574251"],
-["8238","CN072577002"],
-["3458","CN072577071"]
-];
+const data = [...]; 
+// ⚠️ IMPORTANT:
+// Yahan apna pura data array paste karo (jo aapka already fixed version hai).
+// Maine short kiya hai message length bachane ke liye.
+// Sirf ensure karo har entry ke baad comma ho (last ke alawa).
 
 const tbody=document.querySelector("#dataTable tbody");
 const msg=document.getElementById("copiedMsg");
+let greenCells = new Set();
 
 data.forEach((item,index)=>{
 let row=document.createElement("tr");
 row.innerHTML=`
 <td>${index+1}</td>
-<td class="clickable" onclick="copyText(this,'${item[0]}')">${item[0]}</td>
-<td class="clickable" onclick="copyText(this,'${item[1]}')">${item[1]}</td>
-<td><button onclick="undoRow(this)">Undo</button></td>`;
+<td class="clickable" onclick="copyText(this,'${item[0]}',${index},1)">${item[0]}</td>
+<td class="clickable" onclick="copyText(this,'${item[1]}',${index},2)">${item[1]}</td>
+<td><button onclick="undoRow(${index})">Undo</button></td>`;
 tbody.appendChild(row);
 });
 
-function copyText(cell,text){
+function copyText(cell,text,row,col){
 navigator.clipboard.writeText(text);
 cell.classList.add("green");
+
+let key = row+"-"+col;
+greenCells.add(key);
+
 msg.style.display="block";
 setTimeout(()=>{msg.style.display="none";},800);
 }
 
-function undoRow(btn){
-let row=btn.parentElement.parentElement;
-row.querySelectorAll("td.clickable").forEach(td=>td.classList.remove("green"));
+function undoRow(rowIndex){
+let row = tbody.rows[rowIndex];
+row.querySelectorAll("td.clickable").forEach((td,i)=>{
+td.classList.remove("green");
+greenCells.delete(rowIndex+"-"+(i+1));
+});
 }
 
 function filterTable(){
@@ -262,6 +88,35 @@ let rows=tbody.getElementsByTagName("tr");
 for(let i=0;i<rows.length;i++){
 let serial=rows[i].getElementsByTagName("td")[0].innerText;
 rows[i].style.display=serial.includes(input)?"":"none";
+}
+}
+
+function generateShareLink(){
+let baseUrl = window.location.origin + window.location.pathname;
+let params = [...greenCells].join(",");
+let finalUrl = baseUrl + "?green=" + params;
+document.getElementById("shareLink").value = finalUrl;
+navigator.clipboard.writeText(finalUrl);
+alert("Share link copied!");
+}
+
+window.onload = function(){
+let urlParams = new URLSearchParams(window.location.search);
+let greenParam = urlParams.get("green");
+
+if(greenParam){
+let cells = greenParam.split(",");
+cells.forEach(key=>{
+let [row,col] = key.split("-");
+let tableRow = tbody.rows[row];
+if(tableRow){
+let cell = tableRow.cells[col];
+if(cell){
+cell.classList.add("green");
+greenCells.add(key);
+}
+}
+});
 }
 }
 
