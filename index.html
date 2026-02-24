@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <title>Final Copy Panel - Share Enabled</title>
@@ -43,7 +43,7 @@ input{padding:5px;margin-bottom:10px}
 
 <script>
 
-const data = [...]; [
+const data = [
 ["2127","CN072571300"],
 ["2127","CN072571303"],
 ["8924","CN072571304"],
@@ -237,10 +237,9 @@ const data = [...]; [
 ["3458","CN072577071"]
 ];
 
-
 const tbody=document.querySelector("#dataTable tbody");
 const msg=document.getElementById("copiedMsg");
-let greenCells = new Set();
+let greenCells=new Set();
 
 data.forEach((item,index)=>{
 let row=document.createElement("tr");
@@ -255,16 +254,13 @@ tbody.appendChild(row);
 function copyText(cell,text,row,col){
 navigator.clipboard.writeText(text);
 cell.classList.add("green");
-
-let key = row+"-"+col;
-greenCells.add(key);
-
+greenCells.add(row+"-"+col);
 msg.style.display="block";
 setTimeout(()=>{msg.style.display="none";},800);
 }
 
 function undoRow(rowIndex){
-let row = tbody.rows[rowIndex];
+let row=tbody.rows[rowIndex];
 row.querySelectorAll("td.clickable").forEach((td,i)=>{
 td.classList.remove("green");
 greenCells.delete(rowIndex+"-"+(i+1));
@@ -275,31 +271,29 @@ function filterTable(){
 let input=document.getElementById("filterInput").value;
 let rows=tbody.getElementsByTagName("tr");
 for(let i=0;i<rows.length;i++){
-let serial=rows[i].getElementsByTagName("td")[0].innerText;
+let serial=rows[i].cells[0].innerText;
 rows[i].style.display=serial.includes(input)?"":"none";
 }
 }
 
 function generateShareLink(){
-let baseUrl = window.location.origin + window.location.pathname;
-let params = [...greenCells].join(",");
-let finalUrl = baseUrl + "?green=" + params;
-document.getElementById("shareLink").value = finalUrl;
+let baseUrl=window.location.origin+window.location.pathname;
+let params=[...greenCells].join(",");
+let finalUrl=baseUrl+"?green="+params;
+document.getElementById("shareLink").value=finalUrl;
 navigator.clipboard.writeText(finalUrl);
 alert("Share link copied!");
 }
 
-window.onload = function(){
-let urlParams = new URLSearchParams(window.location.search);
-let greenParam = urlParams.get("green");
-
+window.onload=function(){
+let urlParams=new URLSearchParams(window.location.search);
+let greenParam=urlParams.get("green");
 if(greenParam){
-let cells = greenParam.split(",");
-cells.forEach(key=>{
-let [row,col] = key.split("-");
-let tableRow = tbody.rows[row];
+greenParam.split(",").forEach(key=>{
+let [row,col]=key.split("-");
+let tableRow=tbody.rows[row];
 if(tableRow){
-let cell = tableRow.cells[col];
+let cell=tableRow.cells[col];
 if(cell){
 cell.classList.add("green");
 greenCells.add(key);
