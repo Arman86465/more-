@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>User Panel</title>
+
+<!-- Excel Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+body{
+    font-family: Arial;
+    padding:20px;
+    background:#f5f5f5;
+}
+h2{ text-align:center; }
+
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:15px;
+}
+
+input{
+    padding:8px;
+    width:300px;
+}
+
+button{
+    padding:8px 15px;
+    cursor:pointer;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:8px;
+    text-align:center;
+}
+
+th{ background:#eee; }
+
+.copy-cell{ cursor:pointer; }
+
+.copy-cell:hover{ background:#f0f8ff; }
+
+select{ padding:5px; }
+
+.toast{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#333;
+    color:#fff;
+    padding:8px 12px;
+    border-radius:5px;
+    font-size:14px;
+    opacity:0;
+    transition:0.3s;
+}
+</style>
+</head>
+<body>
+
+<h2>User Data Panel</h2>
+
+<div class="top-bar">
+    <input type="text" id="searchInput" placeholder="Search..." onkeyup="filterTable()">
+    <button onclick="downloadExcel()">Download Excel</button>
+</div>
+
+<table id="userTable">
+<thead>
+<tr>
+<th>Sr No</th>
+<th>User ID</th>
+<th>Password</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+
+<div id="toast" class="toast">Copied</div>
+
+<script>
+
+const data = [
+{user:"6234", pass:"CN0925122258"},
+{user:"6957", pass:"CN0925122316"},
+{user:"2951", pass:"CN0925127689"},
+{user:"9227", pass:"CN0925127694"},
+{user:"3624", pass:"CN0925127696"},
+{user:"5893", pass:"CN0925127697"},
+{user:"1378", pass:"CN0925127700"},
+{user:"9784", pass:"CN0925127702"},
+{user:"5045", pass:"CN0925127703"},
+{user:"3439", pass:"CN0925127716"},
+{user:"3818", pass:"CN0925127717"},
+{user:"8853", pass:"CN0925127718"},
+{user:"7586", pass:"CN0925127719"},
+{user:"9585", pass:"CN0925127721"},
+{user:"9461", pass:"CN0925127723"},
+{user:"3439", pass:"CN0925127726"},
+{user:"2309", pass:"CN0925127738"},
+{user:"3457", pass:"CN0925127740"},
+{user:"4213", pass:"CN0925127741"},
+{user:"4458", pass:"CN0925127742"},
+{user:"1057", pass:"CN0925127745"},
+{user:"9298", pass:"CN0925127748"},
+{user:"8994", pass:"CN0925127751"},
+{user:"8535", pass:"CN0925127768"},
+{user:"8067", pass:"CN0925127769"},
+{user:"7475", pass:"CN0925127780"},
+{user:"5312", pass:"CN0925127782"},
+{user:"9505", pass:"CN0925127793"},
+{user:"4659", pass:"CN0925127796"},
+{user:"3936", pass:"CN0925127804"},
+{user:"5732", pass:"CN0925127806"},
+{user:"7920", pass:"CN0925127810"},
+{user:"3578", pass:"CN0925127818"},
+{user:"6762", pass:"CN0925127824"},
+{user:"3968", pass:"CN0925127827"},
+{user:"8051", pass:"CN0925127830"},
+{user:"9901", pass:"CN0925127835"},
+{user:"5507", pass:"CN0925127838"},
+{user:"3243", pass:"CN0925127856"},
+{user:"2804", pass:"CN0925127860"},
+{user:"2799", pass:"CN0925127866"},
+{user:"9250", pass:"CN0925127868"},
+{user:"5359", pass:"CN0925127869"},
+{user:"5795", pass:"CN0925127878"},
+{user:"5351", pass:"CN0925127895"},
+{user:"7620", pass:"CN0925127897"},
+{user:"8746", pass:"CN0925127898"},
+{user:"7306", pass:"CN0925127905"},
+{user:"2789", pass:"CN0925127909"},
+{user:"5053", pass:"CN0925127915"},
+{user:"9608", pass:"CN0925127927"},
+{user:"3206", pass:"CN0925127929"},
+{user:"7710", pass:"CN0925127932"},
+{user:"9212", pass:"CN0925127948"},
+{user:"7944", pass:"CN0925127950"},
+{user:"5957", pass:"CN0925127952"},
+{user:"7292", pass:"CN0925127960"},
+{user:"1743", pass:"CN0925127985"},
+{user:"4454", pass:"CN0925127996"},
+{user:"2552", pass:"CN0925128007"},
+{user:"4811", pass:"CN0925128019"},
+{user:"9423", pass:"CN0925128022"},
+{user:"4779", pass:"CN0925128284"},
+{user:"6373", pass:"CN0925128487"},
+{user:"3570", pass:"CN0925128735"},
+{user:"1669", pass:"CN0925128736"},
+{user:"6606", pass:"CN0925128745"},
+{user:"8050", pass:"CN0925128748"},
+{user:"7158", pass:"CN0925128766"},
+{user:"5039", pass:"CN0925128829"},
+{user:"2963", pass:"CN0925128833"},
+{user:"8941", pass:"CN0925128839"},
+{user:"1223", pass:"CN0925128847"},
+{user:"3800", pass:"CN0925128859"},
+{user:"7734", pass:"CN0925128865"},
+{user:"1861", pass:"CN0925128872"},
+{user:"2908", pass:"CN0925128875"},
+{user:"5506", pass:"CN0925128899"},
+{user:"3503", pass:"CN0925128910"},
+{user:"8427", pass:"CN0925128914"},
+{user:"9075", pass:"CN0925128925"},
+{user:"4193", pass:"CN0925128928"},
+{user:"4833", pass:"CN0925129057"},
+{user:"7810", pass:"CN102554554"},
+{user:"6843", pass:"CN102554581"},
+{user:"5811", pass:"CN102555447"},
+{user:"7542", pass:"CN102556066"},
+{user:"7110", pass:"CN102556096"},
+{user:"4040", pass:"CN102556143"},
+{user:"8504", pass:"CN102557554"},
+{user:"8214", pass:"CN102557631"},
+{user:"8636", pass:"CN102560590"},
+{user:"9004", pass:"CN102560659"},
+{user:"6604", pass:"CN102560697"},
+{user:"2433", pass:"CN102583872"},
+{user:"8394", pass:"CN112525610"},
+{user:"3549", pass:"CN112557862"},
+{user:"8246", pass:"CN112557864"},
+{user:"7617", pass:"CN112557866"},
+{user:"1561", pass:"CN112557883"}
+];
+
+const tableBody=document.getElementById("tableBody");
+
+function loadTable(){
+    tableBody.innerHTML="";
+    data.forEach((item,index)=>{
+        tableBody.innerHTML+=`
+        <tr>
+            <td>${index+1}</td>
+            <td class="copy-cell" onclick="copyText('${item.user}')">${item.user}</td>
+            <td class="copy-cell" onclick="copyText('${item.pass}')">${item.pass}</td>
+            <td>
+                <select>
+                    <option value="">Select</option>
+                    <option>Active</option>
+                    <option>Inactive</option>
+                    <option>Pending</option>
+                    <option>Done</option>
+                </select>
+            </td>
+        </tr>`;
+    });
+}
+
+function copyText(text){
+    navigator.clipboard.writeText(text);
+    const toast=document.getElementById("toast");
+    toast.style.opacity="1";
+    setTimeout(()=>{ toast.style.opacity="0"; },1000);
+}
+
+function filterTable(){
+    const input=document.getElementById("searchInput").value.toLowerCase();
+    const rows=tableBody.getElementsByTagName("tr");
+    for(let i=0;i<rows.length;i++){
+        rows[i].style.display=rows[i].innerText.toLowerCase().includes(input)?"":"none";
+    }
+}
+
+function downloadExcel(){
+    let table = document.getElementById("userTable");
+    let wb = XLSX.utils.table_to_book(table, {sheet:"Users"});
+    XLSX.writeFile(wb, "User_Data.xlsx");
+}
+
+loadTable();
+
+</script>
+</body>
+</html>
