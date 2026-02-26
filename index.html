@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -6,97 +6,190 @@
 
 <style>
 body{
-    background:#000;
-    font-family:Arial, sans-serif;
-    color:#fff;
-    padding:20px;
+    background:black;
+    font-family:Arial;
+    color:white;
+    text-align:center;
 }
 
-h2{
-    text-align:center;
-    color:#00ffcc;
+h1{
+    color:#00ffff;
+    margin-top:20px;
 }
 
 input{
     padding:6px;
-    margin-bottom:10px;
-    width:100px;
+    margin:10px;
+    border-radius:5px;
+    border:none;
+    width:200px;
 }
 
 table{
-    width:100%;
+    margin:auto;
     border-collapse:collapse;
-    background:#111;
+    width:90%;
 }
 
 th,td{
-    border:1px solid #333;
+    border:1px solid #555;
     padding:8px;
-    text-align:center;
     cursor:pointer;
 }
 
 th{
-    background:#222;
-    color:#00ffcc;
+    background:#111;
+    color:#00ffff;
 }
 
-td.copied{
-    background:green;
-    color:#fff;
+td{
+    background:#1a1a1a;
+}
+
+td.green{
+    background:green !important;
+    color:white;
 }
 
 button{
-    padding:4px 8px;
+    padding:5px 10px;
+    border:none;
+    border-radius:5px;
     cursor:pointer;
+    background:#00ffff;
+    font-weight:bold;
 }
 
-#msg{
+#copiedMsg{
     margin-top:10px;
-    color:#00ff00;
-    font-weight:bold;
+    color:lightgreen;
+    height:20px;
 }
 </style>
 </head>
+
 <body>
 
-<h2>Copy Panel</h2>
+<h1>HTML Copy Panel</h1>
 
-<label>Filter Serial No:</label>
-<input type="number" id="filter" onkeyup="filterTable()">
+<input type="number" id="serialFilter" placeholder="Filter by Serial No" onkeyup="filterSerial()">
+
+<div id="copiedMsg"></div>
 
 <table id="dataTable">
 <thead>
 <tr>
-<th>Sr.No</th>
+<th>Sr No</th>
 <th>Username</th>
 <th>Password</th>
 <th>Undo</th>
 </tr>
 </thead>
-<tbody>
-</tbody>
+<tbody></tbody>
 </table>
-
-<div id="msg"></div>
 
 <script>
 
-const data = `7667	CN042562095
-2246	CN042562099
-1464	CN042562102
-6434	CN042562105
-7111	CN042562106
-8630	CN042562121
-7195	CN042562122
-5663	CN042562220
-9696	CN042562229
-4287	CN042562235
-1134	CN042562239
-2529	CN042562240
-8126	CN042562249
-1030	CN042562294
-8557	CN042562329
+const rawData = `6782	CN072579429
+2336	CN072579569
+3198	CN072579641
+9004	CN072581072
+4684	CN072581347
+4123	CN072582687
+1759	CN072585689
+8209	CN072585952
+1514	CN072586042
+9935	CN072587144
+8753	CN072590392
+7530	CN072597614
+7676	CN072598342
+8674	CN072598360
+7345	CN0725103768
+2793	CN0725103784
+6864	CN0725110958
+4825	CN0725111099
+2014	CN0725116224
+3600	CN0725117225
+2477	CN082509812
+8698	CN082509846
+3877	CN082509923
+4298	CN082509946
+5751	CN082509948
+6919	CN082510177
+3198	CN082510501
+4375	CN082510643
+5304	CN082510809
+3630	CN082511029
+1799	CN082511560
+3830	CN082511771
+6686	CN082512232
+7520	CN082512417
+7343	CN082516597
+4878	CN082516626
+9298	CN082516639
+9823	CN082516662
+2954	CN082518763
+3490	CN082520589
+9194	CN082521139
+8662	CN082521298
+7105	CN082521463
+7748	CN082522172
+1254	CN082524882
+6965	CN082525027
+5597	CN082526260
+6464	CN082527094
+6370	CN082527264
+4500	CN082527277
+1812	CN082527293
+5897	CN082527308
+1467	CN082527342
+5628	CN082527376
+2891	CN082527638
+2229	CN082528612
+8382	CN082532228
+2234	CN082532686
+4095	CN082533785
+1451	CN082534572
+4008	CN082534644
+4975	CN082534879
+9906	CN082534903
+5880	CN082534974
+1441	CN082534999
+2753	CN082535003
+1376	CN082535005
+1233	CN082535008
+9971	CN082535009
+3903	CN082535010
+9606	CN082535017
+7276	CN042554715
+2349	CN042555291
+8410	CN042555549
+2807	CN042555616
+5571	CN042556499
+2265	CN042557429
+4569	CN042557440
+1344	CN042557491
+9674	CN042557540
+8018	CN042559256
+5281	CN042559366
+4597	CN042559376
+2349	CN042559459
+7479	CN042559463
+4204	CN042559465
+6479	CN042559467
+1697	CN042559555
+9091	CN042559658
+7316	CN042559842
+8699	CN042560697
+9931	CN042560766
+4436	CN042560841
+7634	CN042560991
+2993	CN042561022
+6355	CN042561463
+7418	CN042561675
+5894	CN042561678
+1698	CN042562001
+7667	CN042562095
 9341	CN042564812
 8382	CN042565059
 6476	CN042565080
@@ -184,77 +277,75 @@ const data = `7667	CN042562095
 9068	CN082547301`;
 
 const tbody = document.querySelector("#dataTable tbody");
+const copiedMsg = document.getElementById("copiedMsg");
+
 let greenCells = new Set();
 
-function loadTable(){
-    const rows = data.trim().split("\n");
-    rows.forEach((row,index)=>{
-        const [user,pass] = row.split("\t");
+function buildTable(){
+    tbody.innerHTML="";
+    const lines = rawData.trim().split("\n");
 
-        const tr = document.createElement("tr");
+    lines.forEach((line,index)=>{
+        const [username,password] = line.split("\t");
+        const row = document.createElement("tr");
 
-        tr.innerHTML = `
+        row.innerHTML=`
             <td>${index+1}</td>
-            <td onclick="copyCell(this,${index},'u')">${user}</td>
-            <td onclick="copyCell(this,${index},'p')">${pass}</td>
+            <td onclick="copyCell(this,'${index}-u')">${username}</td>
+            <td onclick="copyCell(this,'${index}-p')">${password}</td>
             <td><button onclick="undoRow(${index})">Undo</button></td>
         `;
-        tbody.appendChild(tr);
+
+        tbody.appendChild(row);
     });
+
     loadFromURL();
 }
 
-function copyCell(cell,row,type){
+function copyCell(cell,key){
     navigator.clipboard.writeText(cell.innerText);
-    cell.classList.add("copied");
-    greenCells.add(row+"-"+type);
-    document.getElementById("msg").innerText="✔ Copied";
+    greenCells.add(key);
+    cell.classList.add("green");
+    copiedMsg.innerText="✔ Copied";
     updateURL();
 }
 
-function undoRow(row){
-    const tr = tbody.rows[row];
-    tr.cells[1].classList.remove("copied");
-    tr.cells[2].classList.remove("copied");
-    greenCells.delete(row+"-u");
-    greenCells.delete(row+"-p");
+function undoRow(index){
+    greenCells.delete(index+"-u");
+    greenCells.delete(index+"-p");
+    buildTable();
     updateURL();
 }
 
-function filterTable(){
-    const value = document.getElementById("filter").value;
-    Array.from(tbody.rows).forEach(row=>{
-        if(value==="" || row.cells[0].innerText===value){
-            row.style.display="";
-        } else {
-            row.style.display="none";
-        }
+function filterSerial(){
+    const value=document.getElementById("serialFilter").value;
+    const rows=tbody.querySelectorAll("tr");
+    rows.forEach(row=>{
+        const sr=row.children[0].innerText;
+        row.style.display= sr.startsWith(value)? "":"none";
     });
 }
 
 function updateURL(){
-    const params = new URLSearchParams();
-    params.set("green",Array.from(greenCells).join(","));
-    history.replaceState(null,"","?"+params.toString());
+    const arr=[...greenCells];
+    const url=new URL(window.location);
+    url.searchParams.set("green",arr.join(","));
+    window.history.replaceState({},'',url);
 }
 
 function loadFromURL(){
-    const params = new URLSearchParams(window.location.search);
-    if(params.has("green")){
-        const items = params.get("green").split(",");
-        items.forEach(item=>{
-            greenCells.add(item);
-            const [row,type] = item.split("-");
-            const tr = tbody.rows[row];
-            if(tr){
-                if(type==="u") tr.cells[1].classList.add("copied");
-                if(type==="p") tr.cells[2].classList.add("copied");
-            }
-        });
-    }
+    const params=new URLSearchParams(window.location.search);
+    const greens=params.get("green");
+    if(!greens) return;
+    greenCells=new Set(greens.split(","));
+    const rows=tbody.querySelectorAll("tr");
+    rows.forEach((row,i)=>{
+        if(greenCells.has(i+"-u")) row.children[1].classList.add("green");
+        if(greenCells.has(i+"-p")) row.children[2].classList.add("green");
+    });
 }
 
-loadTable();
+buildTable();
 
 </script>
 
