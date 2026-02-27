@@ -2,27 +2,18 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Copy Panel</title>
+<title>HTML Copy Panel</title>
 
 <style>
 body{
     background:black;
-    font-family:Arial;
+    font-family:Arial, sans-serif;
     color:white;
     text-align:center;
 }
 
-h1{
+h2{
     color:#00ffff;
-    margin-top:20px;
-}
-
-input{
-    padding:6px;
-    margin:10px;
-    border-radius:5px;
-    border:none;
-    width:200px;
 }
 
 table{
@@ -31,7 +22,7 @@ table{
     width:90%;
 }
 
-th,td{
+th, td{
     border:1px solid #555;
     padding:8px;
     cursor:pointer;
@@ -53,28 +44,39 @@ td.green{
 
 button{
     padding:5px 10px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
     background:#00ffff;
+    border:none;
+    cursor:pointer;
     font-weight:bold;
 }
 
+button:hover{
+    opacity:0.8;
+}
+
 #copiedMsg{
-    margin-top:10px;
-    color:lightgreen;
-    height:20px;
+    margin-top:15px;
+    color:lime;
+    font-weight:bold;
+}
+
+input{
+    padding:5px;
+    margin:10px;
+    width:100px;
+    text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<h1>HTML Copy Panel</h1>
+<h2>Copy Panel</h2>
 
-<input type="number" id="serialFilter" placeholder="Filter by Serial No" onkeyup="filterSerial()">
+Filter Serial No:
+<input type="number" id="filterInput" placeholder="Enter No">
 
-<div id="copiedMsg"></div>
+<button onclick="shareLink()">Share Link</button>
 
 <table id="dataTable">
 <thead>
@@ -88,264 +90,144 @@ button{
 <tbody></tbody>
 </table>
 
+<div id="copiedMsg"></div>
+
 <script>
 
-const rawData = `6782	CN072579429
-2336	CN072579569
-3198	CN072579641
-9004	CN072581072
-4684	CN072581347
-4123	CN072582687
-1759	CN072585689
-8209	CN072585952
-1514	CN072586042
-9935	CN072587144
-8753	CN072590392
-7530	CN072597614
-7676	CN072598342
-8674	CN072598360
-7345	CN0725103768
-2793	CN0725103784
-6864	CN0725110958
-4825	CN0725111099
-2014	CN0725116224
-3600	CN0725117225
-2477	CN082509812
-8698	CN082509846
-3877	CN082509923
-4298	CN082509946
-5751	CN082509948
-6919	CN082510177
-3198	CN082510501
-4375	CN082510643
-5304	CN082510809
-3630	CN082511029
-1799	CN082511560
-3830	CN082511771
-6686	CN082512232
-7520	CN082512417
-7343	CN082516597
-4878	CN082516626
-9298	CN082516639
-9823	CN082516662
-2954	CN082518763
-3490	CN082520589
-9194	CN082521139
-8662	CN082521298
-7105	CN082521463
-7748	CN082522172
-1254	CN082524882
-6965	CN082525027
-5597	CN082526260
-6464	CN082527094
-6370	CN082527264
-4500	CN082527277
-1812	CN082527293
-5897	CN082527308
-1467	CN082527342
-5628	CN082527376
-2891	CN082527638
-2229	CN082528612
-8382	CN082532228
-2234	CN082532686
-4095	CN082533785
-1451	CN082534572
-4008	CN082534644
-4975	CN082534879
-9906	CN082534903
-5880	CN082534974
-1441	CN082534999
-2753	CN082535003
-1376	CN082535005
-1233	CN082535008
-9971	CN082535009
-3903	CN082535010
-9606	CN082535017
-7276	CN042554715
-2349	CN042555291
-8410	CN042555549
-2807	CN042555616
-5571	CN042556499
-2265	CN042557429
-4569	CN042557440
-1344	CN042557491
-9674	CN042557540
-8018	CN042559256
-5281	CN042559366
-4597	CN042559376
-2349	CN042559459
-7479	CN042559463
-4204	CN042559465
-6479	CN042559467
-1697	CN042559555
-9091	CN042559658
-7316	CN042559842
-8699	CN042560697
-9931	CN042560766
-4436	CN042560841
-7634	CN042560991
-2993	CN042561022
-6355	CN042561463
-7418	CN042561675
-5894	CN042561678
-1698	CN042562001
-7667	CN042562095
-9341	CN042564812
-8382	CN042565059
-6476	CN042565080
-1570	CN042565110
-3005	CN042565212
-3561	CN042565262
-8262	CN042565918
-4167	CN042565921
-5579	CN042565923
-4251	CN042565926
-8190	CN042565927
-5024	CN042565933
-5563	CN042565934
-3617	CN042567567
-6384	CN042567591
-7321	CN042567610
-3097	CN042567620
-5837	CN042567641
-9735	CN042567690
-6764	CN042567713
-7371	CN042567749
-5871	CN042567758
-5944	CN042567795
-7285	CN042567816
-4677	CN042567855
-7168	CN042567873
-8855	CN042567937
-9229	CN042568453
-2536	CN042530844
-8766	CN042569033
-5253	CN042569073
-9625	CN042569112
-3246	CN042569149
-8897	CN042569168
-2403	CN042571779
-6420	CN042571791
-9544	CN042571794
-5210	CN042560798
-6370	CN042572472
-4912	CN042572520
-5957	CN042572626
-4824	CN042572642
-7921	CN042572666
-4707	CN042572717
-3395	CN042578578
-7353	CN042578589
-6073	CN042578600
-3068	CN042578610
-3492	CN042578668
-3164	CN042579091
-7189	CN042580630
-9461	CN042581589
-9320	CN042581611
-1589	CN042584674
-7348	CN042584680
-6974	CN042584687
-4289	CN042584690
-7307	CN042587421
-2887	CN042587428
-1397	CN042587430
-4935	CN082535981
-2151	CN082536156
-4786	CN082536161
-5696	CN082536163
-3150	CN082536186
-7987	CN082536465
-6131	CN082536590
-2739	CN082536598
-5294	CN082536614
-8493	CN082536635
-3821	CN082536649
-7055	CN082536664
-4039	CN082536685
-4430	CN082536698
-6303	CN082536710
-3890	CN082539813
-1814	CN082539816
-9556	CN082539819
-2188	CN082542490
-6001	CN082544946
-6228	CN082545893
-5844	CN082546567
-5628	CN082547280
-3896	CN082547300
-9068	CN082547301`;
+const data = [
+["1479","CN042587432"],
+["3032","CN042587456"],
+["2021","CN042587457"],
+["5065","CN052505774"],
+["1248","CN042587461"],
+["6350","CN052500001"],
+["2774","CN052500002"],
+["3441","CN052500005"],
+["5197","CN052500008"],
+["1479","CN052500009"],
+["5570","CN052500011"],
+["4759","CN052571827"],
+["4590","CN052500014"],
+["1171","CN052500320"],
+["7626","CN052501532"],
+["8095","CN052505261"],
+["9783","CN052505278"],
+["9935","CN052505282"],
+["1450","CN052505298"],
+["4789","CN052505747"],
+["8535","CN062511820"],
+["9617","CN052505827"],
+["3741","CN052506013"],
+["6494","CN052509237"],
+["3376","CN052509253"],
+["5976","CN052509268"],
+["5860","CN052509331"],
+["6507","CN052512941"],
+["1404","CN052512948"],
+["9695","CN052512955"],
+["7795","CN052514689"],
+["9853","CN052525243"],
+["9796","CN052525566"],
+["3303","CN082547303"],
+["5844","CN082547308"],
+["1914","CN082547319"],
+["6021","CN082547321"],
+["8333","CN082548146"],
+["7117","CN082548378"],
+["8036","CN082548817"],
+["7630","CN082548827"],
+["5448","CN082552327"],
+["7898","CN082552521"],
+["8121","CN082556055"],
+["1090","CN082556285"],
+["2986","CN082556527"],
+["9591","CN082556545"],
+["6753","CN082556722"],
+["3729","CN082556827"],
+["9752","CN082556840"],
+["6569","CN082556841"],
+["2552","CN082556854"],
+["5226","CN082556868"],
+["7397","CN082556875"],
+["2052","CN082556877"],
+["6803","CN082556878"],
+["5360","CN082556880"],
+["6833","CN082556898"],
+["9591","CN082557264"],
+["6126","CN082559956"],
+["4697","CN082559999"],
+["9003","CN082565634"],
+["1338","CN082565662"],
+["9985","CN082567776"],
+["5552","CN082567787"]
+];
 
 const tbody = document.querySelector("#dataTable tbody");
 const copiedMsg = document.getElementById("copiedMsg");
 
-let greenCells = new Set();
-
-function buildTable(){
+function renderTable() {
     tbody.innerHTML="";
-    const lines = rawData.trim().split("\n");
+    data.forEach((row,index)=>{
+        const tr=document.createElement("tr");
 
-    lines.forEach((line,index)=>{
-        const [username,password] = line.split("\t");
-        const row = document.createElement("tr");
-
-        row.innerHTML=`
-            <td>${index+1}</td>
-            <td onclick="copyCell(this,'${index}-u')">${username}</td>
-            <td onclick="copyCell(this,'${index}-p')">${password}</td>
-            <td><button onclick="undoRow(${index})">Undo</button></td>
+        tr.innerHTML=`
+        <td>${index+1}</td>
+        <td onclick="copyCell(this,'u${index}')">${row[0]}</td>
+        <td onclick="copyCell(this,'p${index}')">${row[1]}</td>
+        <td><button onclick="undoRow(${index})">Undo</button></td>
         `;
 
-        tbody.appendChild(row);
+        tbody.appendChild(tr);
     });
-
-    loadFromURL();
 }
 
-function copyCell(cell,key){
+function copyCell(cell,id){
     navigator.clipboard.writeText(cell.innerText);
-    greenCells.add(key);
     cell.classList.add("green");
     copiedMsg.innerText="✔ Copied";
-    updateURL();
+
+    let params=new URLSearchParams(window.location.search);
+    params.set(id,"1");
+    history.replaceState(null,"","?"+params.toString());
 }
 
 function undoRow(index){
-    greenCells.delete(index+"-u");
-    greenCells.delete(index+"-p");
-    buildTable();
-    updateURL();
+    const row=tbody.rows[index];
+    row.cells[1].classList.remove("green");
+    row.cells[2].classList.remove("green");
+
+    let params=new URLSearchParams(window.location.search);
+    params.delete("u"+index);
+    params.delete("p"+index);
+    history.replaceState(null,"","?"+params.toString());
 }
 
-function filterSerial(){
-    const value=document.getElementById("serialFilter").value;
-    const rows=tbody.querySelectorAll("tr");
-    rows.forEach(row=>{
-        const sr=row.children[0].innerText;
-        row.style.display= sr.startsWith(value)? "":"none";
+function applyGreenFromURL(){
+    let params=new URLSearchParams(window.location.search);
+    data.forEach((row,index)=>{
+        if(params.get("u"+index)){
+            tbody.rows[index].cells[1].classList.add("green");
+        }
+        if(params.get("p"+index)){
+            tbody.rows[index].cells[2].classList.add("green");
+        }
     });
 }
 
-function updateURL(){
-    const arr=[...greenCells];
-    const url=new URL(window.location);
-    url.searchParams.set("green",arr.join(","));
-    window.history.replaceState({},'',url);
-}
-
-function loadFromURL(){
-    const params=new URLSearchParams(window.location.search);
-    const greens=params.get("green");
-    if(!greens) return;
-    greenCells=new Set(greens.split(","));
-    const rows=tbody.querySelectorAll("tr");
-    rows.forEach((row,i)=>{
-        if(greenCells.has(i+"-u")) row.children[1].classList.add("green");
-        if(greenCells.has(i+"-p")) row.children[2].classList.add("green");
+document.getElementById("filterInput").addEventListener("input",function(){
+    let val=this.value;
+    Array.from(tbody.rows).forEach(row=>{
+        row.style.display = (!val || row.cells[0].innerText===val) ? "" : "none";
     });
+});
+
+function shareLink(){
+    navigator.clipboard.writeText(window.location.href);
+    copiedMsg.innerText="✔ Link Copied";
 }
 
-buildTable();
+renderTable();
+applyGreenFromURL();
 
 </script>
 
